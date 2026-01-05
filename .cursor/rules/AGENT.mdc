@@ -1,0 +1,209 @@
+# 🤖 AGENT.md — mail-client-poc
+
+## Propósito
+
+Este documento define **cómo debe actuar cualquier agente de IA** (Lovable, Cursor, Copilot, etc.) que genere o modifique código en este repositorio.
+
+El objetivo del proyecto es un **POC de un cliente de correos** (inicialmente Gmail) enfocado en **arquitectura, UX y viabilidad técnica**, no en un producto final.
+
+---
+
+## 🎯 Objetivo del proyecto
+
+Construir un **cliente de correo moderno** que permita:
+
+* Autenticación con Google
+* Visualización de correos
+* Lectura de mensajes
+* Operaciones básicas (read / unread)
+
+Este repositorio es un **Proof of Concept (POC)**.
+
+---
+
+## 🧱 Stack tecnológico (OBLIGATORIO)
+
+El agente **DEBE** respetar este stack:
+
+* **TanStack Start** (routing, layouts, server functions)
+* **React 18 + TypeScript**
+* **TanStack Query** para manejo de estado remoto
+* **shadcn/ui** para UI
+* **TailwindCSS** para estilos
+* **lucide-react** para íconos
+* **BetterAuth** para autenticación (Google OAuth)
+
+❌ No introducir otras librerías de UI
+❌ No introducir frameworks adicionales
+
+---
+
+## 🧠 Principios de arquitectura
+
+### 1. POC-first (no sobre-ingeniería)
+
+* No introducir capas innecesarias
+* No Clean Architecture
+* No DDD
+* No repositorios abstractos
+
+La prioridad es **claridad y velocidad**.
+
+---
+
+### 2. Server-first
+
+* Todas las llamadas a Gmail API **DEBEN** hacerse en el servidor
+* Nunca llamar Gmail API desde el browser
+* Usar **Server Functions de TanStack Start** como frontera
+
+---
+
+### 3. Sin base de datos (por ahora)
+
+Para este POC:
+
+* ❌ No usar base de datos
+* ❌ No persistencia propia
+* ✅ Gmail es la fuente de verdad
+* ✅ Sesiones y tokens viven en memoria / cookies
+
+---
+
+## 🔐 Autenticación
+
+* Usar **BetterAuth** con Google Provider
+* Scopes mínimos necesarios
+* Preferir `gmail.readonly` en el POC
+
+El agente:
+
+* NO debe implementar lógica custom de OAuth
+* NO debe almacenar tokens en el cliente
+
+---
+
+## 📬 Gmail API
+
+### Reglas estrictas
+
+* Toda interacción con Gmail API va en `/server/gmail`
+* El cliente solo consume Server Functions
+* No lógica Gmail en componentes React
+
+---
+
+## ⚛️ Frontend / UI
+
+### Estilo
+
+* Inspirado en Gmail / Linear
+* Minimalista
+* Desktop-first
+* UI clara y funcional
+
+---
+
+### Componentes UI
+
+* Usar componentes de **shadcn/ui**
+* Preferir composición sobre abstracción
+* Componentes pequeños y reutilizables
+
+Ejemplos válidos:
+
+* `ResizablePanelGroup`
+* `ScrollArea`
+* `Card`
+* `DropdownMenu`
+
+---
+
+## 🔄 Estado y datos
+
+* Usar **TanStack Query** para:
+
+  * Listado de correos
+  * Vista de mensaje
+  * Refetch
+  * Cache
+
+* No usar `useEffect` para fetching
+
+* No manejar loading/error states manualmente
+
+---
+
+## 🗂️ Estructura de carpetas (referencia)
+
+```
+/src
+  /routes
+  /components
+    /layout
+    /mail
+  /server
+    /auth
+    /gmail
+  /lib
+```
+
+El agente debe respetar esta organización.
+
+---
+
+## 🚦 Qué SÍ puede hacer el agente
+
+* Crear componentes React
+* Crear layouts
+* Crear server functions
+* Mockear datos
+* Mejorar UX/UI
+* Refactorizar para claridad
+
+---
+
+## ⛔ Qué NO debe hacer el agente
+
+* Añadir base de datos
+* Añadir lógica de negocio compleja
+* Añadir librerías no aprobadas
+* Implementar features fuera del alcance
+* Optimizar prematuramente
+
+---
+
+## 🧪 Alcance funcional del POC
+
+### Incluido
+
+* Login con Google
+* Inbox
+* Vista de mensaje
+* Marcar como leído
+
+### Fuera de alcance
+
+* Enviar correos
+* Adjuntos
+* Búsqueda avanzada
+* Etiquetas custom
+* Multi-provider (por ahora)
+
+---
+
+## 🧠 Regla de oro
+
+> Si una decisión no ayuda a **validar el POC más rápido**, no debe implementarse.
+
+---
+
+## 📌 Nota final
+
+Este documento es **obligatorio** para cualquier agente de IA que trabaje en este repositorio.
+
+Ante dudas:
+
+* Priorizar simplicidad
+* Priorizar legibilidad
+* Priorizar intención de POC

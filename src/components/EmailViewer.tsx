@@ -141,7 +141,7 @@ export function EmailViewer({ selectedEmailId }: { selectedEmailId: string | nul
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-background">
+    <div className="flex flex-1 flex-col bg-background overflow-hidden">
       <div className="flex h-16 items-center justify-between border-b border-border px-8">
         <div className="flex gap-2">
           <Button variant="ghost" size="icon">
@@ -155,7 +155,7 @@ export function EmailViewer({ selectedEmailId }: { selectedEmailId: string | nul
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-[calc(100vh-4rem)]">
         <div className="mx-auto max-w-3xl px-8 py-12">
           <h1 className="mb-8 text-2xl font-medium leading-tight text-balance">{email.subject}</h1>
           <div className="mb-8 flex items-center gap-4">

@@ -3,8 +3,9 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { listEmails } from "@/serverFunctions/gmail.list";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 
-export function EmailList({ selectedEmailId, setSelectedEmailId }: { selectedEmailId: string | null, setSelectedEmailId: (id: string) => void }) {
+export function EmailList({ selectedEmailId }: { selectedEmailId: string | null }) {
   const { data: emails = [] } = useQuery({
     queryKey: ["emails"],
     queryFn: () => listEmails(),
@@ -24,9 +25,10 @@ export function EmailList({ selectedEmailId, setSelectedEmailId }: { selectedEma
       <ScrollArea className="h-[calc(100vh-4rem)]">
         <div className="divide-y divide-border">
           {emails.map((email) => (
-            <button
+            <Link
               key={email.id}
-              onClick={() => setSelectedEmailId(email.id)}
+              to="/"
+              search={{ emailId: email.id }}
               className={`flex w-full flex-col gap-2 px-6 py-4 text-left transition-colors hover:bg-secondary/50 ${selectedEmailId === email.id ? "bg-secondary" : ""
                 }`}
             >
@@ -42,7 +44,7 @@ export function EmailList({ selectedEmailId, setSelectedEmailId }: { selectedEma
               <p className={`text-sm ${email.unread ? "font-medium" : "font-normal"}`}>{email.subject}</p>
               <p className="line-clamp-2 text-xs text-muted-foreground">{email.snippet}</p>
               {email.unread && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
-            </button>
+            </Link>
           ))}
         </div>
       </ScrollArea>

@@ -2,13 +2,44 @@ import { createServerFn } from "@tanstack/react-start"
 import { getGmailClient } from "@/server/gmail"
 import { getSession } from "@/serverFunctions/auth-server-fn"
 import { getGoogleAccountByUserId } from "@/server/queries/account"
+import type { EmailListItem } from "@/types/email"
 
-function getHeader(headers: any[], name: string) {
-  return headers.find(h => h.name === name)?.value ?? ""
+interface GmailHeader {
+  name: string
+  value: string
 }
 
-function parseMessage(message: any) {
-  const headers = message.payload.headers
+interface GmailMessagePayload {
+  headers?: GmailHeader[]
+  parts?: GmailMessagePart[]
+}
+
+interface GmailMessagePart {
+  mimeType?: string
+  headers?: GmailHeader[]
+  body?: {
+    data?: string
+  }
+  parts?: GmailMessagePart[]
+}
+
+interface GmailMessage {
+  id: string
+  threadId: string
+  snippet?: string | null
+  internalDate?: string | null
+  payload?: GmailMessagePayload
+  labelIds?: string[]
+}
+
+function getHeader(headers: GmailHeader[] | undefined, name: string): string {
+  if (!headers) return ""
+  return headers.find((h) => h.name === name)?.value ?? ""
+}
+
+function parseMessage(message: GmailMessage): EmailListItem {
+  const headers = message.payload?.headers ?? []
+  const labelIds = message.labelIds ?? []
 
   return {
     id: message.id,
@@ -17,8 +48,9 @@ function parseMessage(message: any) {
     from: getHeader(headers, "From"),
     to: getHeader(headers, "To"),
     date: getHeader(headers, "Date"),
-    snippet: message.snippet,
-    internalDate: Number(message.internalDate),
+    snippet: message.snippet ?? "",
+    internalDate: Number(message.internalDate ?? 0),
+    unread: labelIds.includes("UNREAD"),
   }
 }
 
@@ -46,7 +78,9 @@ export const listEmails = createServerFn({
   const messages = res.data.messages ?? []
 
   const emails = await Promise.all(
-    messages.map(async (m: any) => {
+    messages.map(async (m) => {
+      if (!m.id) return null
+      
       const full = await gmail.users.messages.get({
         userId: "me",
         id: m.id,
@@ -54,10 +88,11 @@ export const listEmails = createServerFn({
         metadataHeaders: ["From", "To", "Subject", "Date"],
       })
 
-      return parseMessage(full.data)
+      if (!full.data) return null
+      
+      return parseMessage(full.data as GmailMessage)
     })
   )
 
-
-  return emails ?? []
+  return emails.filter((email): email is EmailListItem => email !== null)
 })

@@ -1,23 +1,36 @@
 import { EmailList } from '@/components/EmailList'
 import { EmailViewer } from '@/components/EmailViewer'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { authMiddleware } from '@/lib/middleware'
+import { listEmails } from '@/serverFunctions/gmail.list'
+import { z } from 'zod'
+
+const indexSearchSchema = z.object({
+  emailId: z.string().optional(),
+})
 
 export const Route = createFileRoute('/')({
-    component: App,
-    server: {
-        middleware: [authMiddleware],
-    },
+  component: App,
+  validateSearch: indexSearchSchema,
+  server: {
+    middleware: [authMiddleware],
+  },
+  loader: async ({ context }) => {
+    // Prefetch emails list using TanStack Query
+    await context.queryClient.prefetchQuery({
+      queryKey: ['emails'],
+      queryFn: () => listEmails(),
+    })
+  },
 })
 
 function App() {
-  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const { emailId } = Route.useSearch()
 
   return (
     <>
-      <EmailList selectedEmailId={selectedEmailId} setSelectedEmailId={setSelectedEmailId} />
-      <EmailViewer selectedEmailId={selectedEmailId} />
+      <EmailList selectedEmailId={emailId ?? null} />
+      <EmailViewer selectedEmailId={emailId ?? null} />
     </>
   )
 }

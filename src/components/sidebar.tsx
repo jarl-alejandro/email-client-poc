@@ -2,7 +2,7 @@ import { Inbox, Star, Send, FileText, Archive, Trash2, LogOut, User } from "luci
 import { useState } from "react"
 import { useQuery } from '@tanstack/react-query'
 import { authClient } from "@/lib/auth-client"
-import { getSession } from "@/lib/auth-server-fn"
+import { getSession } from "@/serverFunctions/auth-server-fn"
 
 export function Sidebar() {
   const [activeFolder, setActiveFolder] = useState("inbox")

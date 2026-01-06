@@ -2,9 +2,14 @@ import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Email } from "@/types/email";
-import { mockEmails } from "@/lib/mock-data";
+import { listEmails } from "@/serverFunctions/gmail.list";
+import { useQuery } from "@tanstack/react-query";
 
 export function EmailList({ selectedEmail, setSelectedEmail }: { selectedEmail: Email | null, setSelectedEmail: (email: Email) => void }) {
+  const { data: emails = [] } = useQuery({
+    queryKey: ["emails"],
+    queryFn: () => listEmails(),
+  })
 
   return (
     <div className="w-96 border-r border-border bg-background">
@@ -19,7 +24,7 @@ export function EmailList({ selectedEmail, setSelectedEmail }: { selectedEmail: 
       </div>
       <ScrollArea className="h-[calc(100vh-4rem)]">
         <div className="divide-y divide-border">
-          {mockEmails.map((email) => (
+          {emails.map((email) => (
             <button
               key={email.id}
               onClick={() => setSelectedEmail(email)}

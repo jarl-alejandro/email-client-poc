@@ -1,11 +1,10 @@
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
-import { Email } from "@/types/email";
 import { listEmails } from "@/serverFunctions/gmail.list";
 import { useQuery } from "@tanstack/react-query";
 
-export function EmailList({ selectedEmail, setSelectedEmail }: { selectedEmail: Email | null, setSelectedEmail: (email: Email) => void }) {
+export function EmailList({ selectedEmailId, setSelectedEmailId }: { selectedEmailId: string | null, setSelectedEmailId: (id: string) => void }) {
   const { data: emails = [] } = useQuery({
     queryKey: ["emails"],
     queryFn: () => listEmails(),
@@ -27,8 +26,8 @@ export function EmailList({ selectedEmail, setSelectedEmail }: { selectedEmail: 
           {emails.map((email) => (
             <button
               key={email.id}
-              onClick={() => setSelectedEmail(email)}
-              className={`flex w-full flex-col gap-2 px-6 py-4 text-left transition-colors hover:bg-secondary/50 ${selectedEmail?.id === email.id ? "bg-secondary" : ""
+              onClick={() => setSelectedEmailId(email.id)}
+              className={`flex w-full flex-col gap-2 px-6 py-4 text-left transition-colors hover:bg-secondary/50 ${selectedEmailId === email.id ? "bg-secondary" : ""
                 }`}
             >
               <div className="flex items-start justify-between gap-2">
